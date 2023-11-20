@@ -1,0 +1,3 @@
+[submodule "Sources/jfwells_linux-asus-t100ta"]
+	path = Sources/jfwells_linux-asus-t100ta
+	url = git@github.com:jfwells/linux-asus-t100ta.git
