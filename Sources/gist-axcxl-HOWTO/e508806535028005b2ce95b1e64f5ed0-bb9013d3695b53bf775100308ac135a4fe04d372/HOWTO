@@ -1,0 +1,80 @@
+System description:
+- 1GB RAM
+- Intel Atom Z3735G
+- 32GB MMC
+- card reader
+- docking keyboard with USB 3.0 port
+
+# Puppy Linux
+
+RESULT: no wireless out of the box with BionicPup64 8.0, device does not show up in lspci either (hw kill switch?)
+
+How to install:
+- download image http://puppylinux.com/index.html#download
+- format USB drive with FAT32 partition
+- using Unetbootin, write iso to formatted USB drive
+- download Grub2 UEFI 32-bit version from here http://distro.ibiblio.org/fatdog/packages/700/grub2-efi32-2.00-i686-1.txz [1]
+- extract the tarball from previous step, find grubia32.efi and rename it to bootia32.efi
+- on the USB drive create EFI/boot folder
+- put bootia32.efi in EFI/boot folder on USB drive
+
+NOTE: use Unetbootin instead of Etcher or dd to be able to edit the partition after - it is similar to Rufus ISO mode.
+
+How to boot [2]:
+- plug in USB
+- power up tablet
+- enter BIOS on tablet (with docking station, hit F2 or ESC at boot)
+- disable secure boot
+
+How to fix the wireless:
+- download https://github.com/Asus-T100/firmware/blob/master/brcm/brcmfmac43340-sdio.txt
+- copy to /lib/firmware/brcm
+- modprobe -r brcmfmac
+- modprobe brcmfmac
+
+# Install to hdd
+- did not write the exact steps, but just a few notes
+- created EFI FAT32 partition and ext4 normal partition
+- installed via script to ext4 partition (scripts said boot would not work, ignored)
+- copied EFI/boot/bootia32.efi (keeping folder struct) folder from USB and: grub.cfg, initrd.gz, ldlinux.sys, vmlinuz from ext4 partition to EFI partition 
+- using `pmedia=cd pfix=nocopy` (do not copy sfs to RAM)
+- after boot and save everything works ok, no further problems
+- NOTE: use x64 packet versions!
+
+# Other problems
+## SSH
+- use Dropbear, easier to install and start: install, dropbear -R to generate the keys, service dropbear start
+- to login: root/woofwoof
+- not sure how to change the password, so simply disabled password logins by adding -s param to dropbear params (edited /etc/init.d/dropbear direcly, need to investigate correct way to do it
+
+## Brightness
+- to set it use `xrandr --output DSI-1 --brightness 0.5`
+- see [3] for more details and a .pet for a taskbar control
+
+## Keepass2
+- to get it working `ln -s /usr/bin/mono /usr/bin/cli` [4]
+
+## Screen rotation
+- for now testing [5] with the following set:
+TOUCHPAD='Asus Touchpad'
+TOUCHSCREEN='SIS0817...' (get output from xinput)
+
+## On screen keyboard
+- install xvkbd if not already installed
+- to config, set things in /etc/X11/app-defaults/XVkbd-common
+- increased size: `XVkbd.geometry: 1000x300`
+- removed keypad and function keys: `xvkbd.compact: true`
+
+
+FOR MORE INFO SEE: https://wiki.debian.org/InstallingDebianOn/Asus/T100TA
+
+
+References:
+[1] http://blog.puppylinux.com/booting-slacko-63-on-uefi
+[2] https://github.com/5bentz/linux-asus-t100/blob/master/T100TA_guide.md
+[3] http://murga-linux.com/puppy/viewtopic.php?p=1004739&sid=071d912f26b6ff9c170447f0fddb6f96
+[4] https://catonrug.blogspot.com/2014/05/keepass2-usr-bin-cli-no-such-file-or-directory-puppy-linux.html
+
+TODO:
+- side buttons not working
+- sleep -> NOT WORKING, see link

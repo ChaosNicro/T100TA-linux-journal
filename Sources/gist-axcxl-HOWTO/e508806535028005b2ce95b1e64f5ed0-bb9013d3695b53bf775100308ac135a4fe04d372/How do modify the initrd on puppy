@@ -1,0 +1,14 @@
+Initrd can be unpacked and modified as needed.
+
+To repack it, run in the same folder: find ./ | grep -v initrd.gz | cpio -H newc -o | gzip -6 > initrd.gz 
+
+How to modify it on the device, in flash - run this as a script on the device stopped in initrd:
+#!/bin/sh
+
+mkdir /mnt/boot
+mkdir /mnt/usb
+
+mount /dev/sda1 /mnt/usb
+mount /dev/mmcblk1p1 /mnt/boot
+
+cp /mnt/usb/initrd.gz /mnt/boot/
